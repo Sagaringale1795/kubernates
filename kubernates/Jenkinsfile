@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_IMAGE = "sagaringale03/kubernates"
+        KUBECONFIG_CRED = 'kubeconfig'
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+        stage('Docker Build & Push') {
+            steps {
+                sh "docker build -t ${DOCKER_IMAGE}:latest ."
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
+                                                 usernameVariable: 'USER',
+                                                 passwordVariable: 'PASS')]) {
+                    sh '''
+                    echo "$PASS" | docker login -u "$USER" --password-stdin
+                    docker push ${DOCKER_IMAGE}:latest
+                    '''
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: "${KUBECONFIG_CRED}", variable: 'KUBECONFIG_PATH')]) {
+                    sh 'kubectl --kubeconfig=$KUBECONFIG_PATH apply -f k8s/'
+                }
+            }
+        }
+    }
+}
