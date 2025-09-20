@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: kubernates
-          image: <your-dockerhub-username>/kubernates:latest
+          image: sagaringale03/kubernates:latest
           ports:
             - containerPort: 8080
+
 
