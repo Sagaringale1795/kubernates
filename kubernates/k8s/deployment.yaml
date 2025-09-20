@@ -1,1 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubernates
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kubernates
+  template:
+    metadata:
+      labels:
+        app: kubernates
+    spec:
+      containers:
+        - name: kubernates
+          image: <your-dockerhub-username>/kubernates:latest
+          ports:
+            - containerPort: 8080
 
